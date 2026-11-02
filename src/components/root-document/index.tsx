@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 
-import { HeadContent, Scripts } from "@tanstack/react-router";
+import { HeadContent, ScriptOnce, Scripts } from "@tanstack/react-router";
+
+import { themeScript } from "@/lib/theme";
 
 type RootDocumentProps = {
   children: ReactNode;
@@ -8,8 +10,9 @@ type RootDocumentProps = {
 
 export function RootDocument({ children }: RootDocumentProps) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
+        <ScriptOnce>{themeScript}</ScriptOnce>
         <HeadContent />
       </head>
       <body>

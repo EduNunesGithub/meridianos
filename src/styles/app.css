@@ -1,8 +1,171 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --accent: #b03a24;
+  --accent-ink: #fbf6ec;
+  --accent-soft: rgb(176 58 36 / 10%);
+  --chip-active: #1c1a16;
+  --chip-active-ink: #f2ede3;
+  --flag-shadow: rgb(58 42 18 / 20%);
+  --flag-stroke: rgb(28 26 22 / 10%);
+  --ink: #1c1a16;
+  --ink-2: #4a443a;
+  --ink-3: #656054;
+  --line: #d8cfbd;
+  --line-strong: #1c1a16;
+  --mat: #e7dfce;
+  --mat-glow: none;
+  --mat-hover: #dfd1b8;
+  --page: #f2ede3;
+  --region-africa: #af6f22;
+  --region-americas: #9c3d6b;
+  --region-asia: #3c7a55;
+  --region-europe: #3b5a8a;
+  --region-oceania: #24807f;
+  --surface: #faf6ee;
+  color-scheme: light;
+}
+
+.dark {
+  --accent: #e2ae5f;
+  --accent-ink: #0b1221;
+  --accent-soft: rgb(226 174 95 / 10%);
+  --chip-active: #e2ae5f;
+  --chip-active-ink: #0b1221;
+  --flag-shadow: rgb(0 0 0 / 70%);
+  --flag-stroke: rgb(255 255 255 / 10%);
+  --ink: #eee5d1;
+  --ink-2: #afb6c6;
+  --ink-3: #7e889e;
+  --line: #202b43;
+  --line-strong: #3a4763;
+  --mat: #131c30;
+  --mat-glow: radial-gradient(
+    ellipse 55% 55% at 50% 50%,
+    rgb(243 213 158 / 20%) 0%,
+    rgb(243 213 158 / 0%) 100%
+  );
+  --mat-hover: #1a2541;
+  --page: #0b1221;
+  --region-africa: #e6a956;
+  --region-americas: #d88ab0;
+  --region-asia: #86c49c;
+  --region-europe: #95aedb;
+  --region-oceania: #6cc6c0;
+  --surface: #111a2c;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-chip-active: var(--chip-active);
+  --color-chip-active-ink: var(--chip-active-ink);
+  --color-flag-stroke: var(--flag-stroke);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-mat: var(--mat);
+  --color-mat-hover: var(--mat-hover);
+  --color-page: var(--page);
+  --color-region-africa: var(--region-africa);
+  --color-region-americas: var(--region-americas);
+  --color-region-asia: var(--region-asia);
+  --color-region-europe: var(--region-europe);
+  --color-region-oceania: var(--region-oceania);
+  --color-surface: var(--surface);
+  --shadow-dock: 0 12px 32px var(--flag-shadow);
+  --shadow-flag: 0 12px 24px var(--flag-shadow);
+  --shadow-flag-lifted: 0 16px 32px var(--flag-shadow);
+  --shadow-flag-sm: 0 4px 12px var(--flag-shadow);
+}
+
+@theme {
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-mono: "DM Mono", ui-monospace, monospace;
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+@utility mat-glow {
+  background-image: var(--mat-glow);
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+}
+
+@utility type-body {
+  @apply font-sans text-sm text-ink-2;
+}
+
+@utility type-caption {
+  @apply font-sans text-xs text-ink-2;
+}
+
+@utility type-control {
+  @apply font-sans text-sm font-medium;
+}
+
+@utility type-coordinates {
+  @apply font-mono text-xs tracking-wider;
+}
+
+@utility type-count {
+  @apply font-mono text-xs;
+}
+
+@utility type-display-lg {
+  @apply font-display text-3xl font-normal;
+}
+
+@utility type-display-md {
+  @apply font-display text-2xl font-normal;
+}
+
+@utility type-footer-wordmark {
+  @apply font-display text-7xl font-normal tracking-tight italic lg:text-8xl;
+}
+
+@utility type-heading {
+  @apply font-display text-3xl font-normal md:text-5xl;
+}
+
+@utility type-headline {
+  @apply font-display text-5xl font-normal tracking-tight md:text-7xl;
+}
+
+@utility type-intro {
+  @apply font-sans text-base text-ink-2;
+}
+
+@utility type-label {
+  @apply font-mono text-xs tracking-widest uppercase;
+}
+
+@utility type-placeholder {
+  @apply font-display text-lg italic;
+}
+
+@utility type-quote-heading {
+  @apply font-display text-4xl font-normal italic;
+}
+
+@utility type-suggestion {
+  @apply font-display text-base italic;
+}
+
+@utility type-wordmark {
+  @apply font-display text-3xl font-normal italic;
+}
+
 @layer base {
   body {
-    @apply bg-white text-base text-zinc-900 antialiased;
+    @apply bg-page font-sans text-base text-ink antialiased;
   }
 
   h1 {
@@ -10,6 +173,6 @@
   }
 
   p {
-    @apply text-lg text-zinc-600;
+    @apply text-lg text-ink-2;
   }
 }

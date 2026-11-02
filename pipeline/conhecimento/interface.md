@@ -63,8 +63,23 @@
 
 ## Padrões
 
-- Nenhum registrado.
+### Tema diurno e noturno
+
+- Exemplar: `src/styles/app.css`, `src/lib/theme.ts` e `src/hooks/use-theme/index.ts`
+- Como:
+  - Os tokens de cor são variáveis CSS em `:root` (claro) e `.dark` (escuro) no `app.css`, expostas ao Tailwind por `@theme inline`. A variante escura é `@custom-variant dark` pela classe `dark` no `<html>`.
+  - Um script inline, em `ScriptOnce` no `<head>` do `RootDocument`, aplica a classe antes da pintura, a partir da escolha salva no `localStorage` ou de `prefers-color-scheme`.
+  - O React lê o tema pelo hook `useTheme`, cuja fonte de verdade é a classe no `<html>`. A aparência que depende do tema usa só `dark:`, nunca uma condição no render.
+- Por quê: sem a classe aplicada antes da pintura, o tema errado aparece por um instante; com uma condição no render, o HTML do servidor diverge do cliente na hidratação.
+
+### Estilos de texto por utilitário de contexto
+
+- Exemplar: `src/styles/app.css`
+- Como: cada estilo de texto do design (família, tamanho, peso, tracking) é um `@utility type-<contexto>` no `app.css` e entra no `className` como `type-<contexto>`, junto com a cor.
+- Por quê: UI-6 pede a tipografia num lugar só; sem um nome por contexto, cada componente montaria a sua combinação de tamanho e tracking.
 
 ## Armadilhas
 
-- Nenhuma registrada.
+### Duração padrão das transições do Tailwind
+
+- Atenção: as utilidades `transition`, `transition-colors`, `transition-shadow` e as demais usam `--default-transition-duration`, que é 150ms no Tailwind. Esse valor fere UI-5 e não aparece no código. Toda transição leva um `duration-*` com valor múltiplo de 250ms.
