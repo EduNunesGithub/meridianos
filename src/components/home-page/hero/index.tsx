@@ -1,13 +1,20 @@
 import { Input } from "@base-ui/react/input";
 import { Search } from "lucide-react";
+import { motion } from "motion/react";
 
 import { FlagOfTheDay } from "@/components/home-page/hero/flag-of-the-day";
+import { useRevealOnEnter } from "@/hooks/use-reveal-on-enter";
 
 const suggestions = ["Islândia", "Butão", "Quiribati", "Peru"];
 
 export function Hero() {
+  const reveal = useRevealOnEnter();
+
   return (
-    <section className="mx-auto hidden w-full max-w-360 flex-col gap-12 px-10 pt-12 pb-14 md:flex lg:flex-row lg:items-end lg:gap-16 xl:px-20">
+    <motion.section
+      className="mx-auto hidden w-full max-w-360 flex-col gap-12 px-10 pt-12 pb-14 md:flex lg:flex-row lg:items-end lg:gap-16 xl:px-20"
+      {...reveal}
+    >
       <div className="flex flex-1 flex-col gap-8">
         <div className="flex items-center gap-3">
           <span aria-hidden className="h-px w-8 bg-accent" />
@@ -52,6 +59,6 @@ export function Hero() {
         </div>
       </div>
       <FlagOfTheDay />
-    </section>
+    </motion.section>
   );
 }

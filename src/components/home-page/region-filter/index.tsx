@@ -1,11 +1,16 @@
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
+import { motion } from "motion/react";
 import { twMerge } from "tailwind-merge";
 
 import type { RegionFilter as RegionFilterValue } from "@/data/regions";
 
+import { ActiveIndicatorGroup } from "@/components/active-indicator-group";
+import { ActiveIndicator } from "@/components/active-indicator-group/active-indicator";
 import { RegionDot } from "@/components/region-dot";
 import { regions, totalCountries } from "@/data/regions";
+import { useMotionToken } from "@/hooks/use-motion-token";
+import { gestureFeedback } from "@/lib/motion";
 
 type RegionFilterProps = {
   className?: string;
@@ -23,6 +28,8 @@ export function RegionFilter({
   onChange,
   value,
 }: RegionFilterProps) {
+  const buttonFeedback = useMotionToken(gestureFeedback.button);
+
   function handleValueChange(nextValue: RegionFilterValue[]) {
     const [selected] = nextValue;
     if (selected) {
@@ -31,25 +38,30 @@ export function RegionFilter({
   }
 
   return (
-    <ToggleGroup
-      aria-label="Filtrar por região"
-      className={twMerge("flex items-center gap-2", className)}
-      onValueChange={handleValueChange}
-      value={[value]}
-    >
-      {options.map((option) => (
-        <Toggle
-          className="group flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-full border border-line px-4 type-control text-ink transition-colors duration-250 hover:border-line-strong data-pressed:border-chip-active data-pressed:bg-chip-active data-pressed:text-chip-active-ink"
-          key={option.id}
-          value={option.id}
-        >
-          {option.id !== "all" && <RegionDot region={option.id} />}
-          {option.label}
-          <span className="type-count text-ink-3 group-data-pressed:text-chip-active-ink/60">
-            {option.count}
-          </span>
-        </Toggle>
-      ))}
-    </ToggleGroup>
+    <ActiveIndicatorGroup>
+      <ToggleGroup
+        aria-label="Filtrar por região"
+        className={twMerge("flex items-center gap-2", className)}
+        onValueChange={handleValueChange}
+        render={<motion.div layoutScroll />}
+        value={[value]}
+      >
+        {options.map((option) => (
+          <Toggle
+            className="group relative isolate flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-full border border-line px-4 type-control text-ink transition-colors duration-250 hover:border-line-strong data-pressed:text-chip-active-ink"
+            key={option.id}
+            render={<motion.button {...buttonFeedback} />}
+            value={option.id}
+          >
+            {option.id === value && <ActiveIndicator className="-inset-px" />}
+            {option.id !== "all" && <RegionDot region={option.id} />}
+            {option.label}
+            <span className="type-count text-ink-3 group-data-pressed:text-chip-active-ink/60">
+              {option.count}
+            </span>
+          </Toggle>
+        ))}
+      </ToggleGroup>
+    </ActiveIndicatorGroup>
   );
 }

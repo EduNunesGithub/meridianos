@@ -1,6 +1,12 @@
+import { motion } from "motion/react";
+
+import { useRevealOnEnter } from "@/hooks/use-reveal-on-enter";
+
 export function SiteFooter() {
+  const reveal = useRevealOnEnter();
+
   return (
-    <footer className="hidden bg-mat md:block">
+    <motion.footer className="hidden bg-mat md:block" {...reveal}>
       <div className="mx-auto flex w-full max-w-360 flex-col gap-8 px-10 pt-12 pb-8 xl:px-20">
         <div className="flex items-end justify-between gap-8">
           <span className="type-footer-wordmark text-ink">Meridiano</span>
@@ -16,6 +22,6 @@ export function SiteFooter() {
           <span className="type-label">↑ Voltar ao topo</span>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   );
 }

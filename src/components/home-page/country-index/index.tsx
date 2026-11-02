@@ -1,7 +1,10 @@
+import { motion } from "motion/react";
+
 import type { Country } from "@/data/countries";
 
 import { Almanac } from "@/components/home-page/country-index/almanac";
 import { CountryGrid } from "@/components/home-page/country-index/country-grid";
+import { useRevealOnEnter } from "@/hooks/use-reveal-on-enter";
 
 type CountryIndexProps = {
   countries: Country[];
@@ -12,9 +15,13 @@ const leadingCount = 8;
 export function CountryIndex({ countries }: CountryIndexProps) {
   const leadingCountries = countries.slice(0, leadingCount);
   const trailingCountries = countries.slice(leadingCount);
+  const reveal = useRevealOnEnter();
 
   return (
-    <section className="mx-auto hidden w-full max-w-360 flex-col gap-8 px-10 md:flex xl:px-20">
+    <motion.section
+      className="mx-auto hidden w-full max-w-360 flex-col gap-8 px-10 md:flex xl:px-20"
+      {...reveal}
+    >
       <div className="flex flex-col justify-between gap-4 pt-12 lg:flex-row lg:items-end">
         <div className="flex flex-col gap-2">
           <span className="type-label text-accent">Capítulo I</span>
@@ -28,10 +35,8 @@ export function CountryIndex({ countries }: CountryIndexProps) {
       <div className="flex flex-col gap-10">
         <CountryGrid countries={leadingCountries} />
         <Almanac />
-        {trailingCountries.length > 0 && (
-          <CountryGrid countries={trailingCountries} />
-        )}
+        <CountryGrid countries={trailingCountries} />
       </div>
-    </section>
+    </motion.section>
   );
 }

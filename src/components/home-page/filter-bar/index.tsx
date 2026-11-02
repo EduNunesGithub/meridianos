@@ -1,10 +1,14 @@
 import { Button } from "@base-ui/react/button";
 import { ArrowDownUp, ChevronDown } from "lucide-react";
+import { motion } from "motion/react";
 
 import type { RegionFilter as RegionFilterValue } from "@/data/regions";
 
 import { RegionFilter } from "@/components/home-page/region-filter";
 import { totalCountries } from "@/data/regions";
+import { useMotionToken } from "@/hooks/use-motion-token";
+import { useRevealOnEnter } from "@/hooks/use-reveal-on-enter";
+import { gestureFeedback } from "@/lib/motion";
 
 type FilterBarProps = {
   onRegionChange: (value: RegionFilterValue) => void;
@@ -17,8 +21,14 @@ export function FilterBar({
   region,
   visibleCount,
 }: FilterBarProps) {
+  const buttonFeedback = useMotionToken(gestureFeedback.button);
+  const reveal = useRevealOnEnter();
+
   return (
-    <div className="mx-auto hidden w-full max-w-360 px-10 md:block xl:px-20">
+    <motion.div
+      className="mx-auto hidden w-full max-w-360 px-10 md:block xl:px-20"
+      {...reveal}
+    >
       <div className="flex flex-wrap items-center justify-between gap-4 border-y border-line-strong py-3">
         <div className="flex flex-wrap items-center gap-3">
           <span className="type-label text-ink-3">Regiões</span>
@@ -32,13 +42,16 @@ export function FilterBar({
           <span aria-live="polite" className="type-label text-ink-3">
             Mostrando {visibleCount} de {totalCountries}
           </span>
-          <Button className="flex h-10 cursor-pointer items-center gap-2 rounded-full border border-line px-4 type-control text-ink transition-colors duration-250 hover:border-line-strong">
+          <Button
+            className="flex h-10 cursor-pointer items-center gap-2 rounded-full border border-line px-4 type-control text-ink transition-colors duration-250 hover:border-line-strong"
+            render={<motion.button {...buttonFeedback} />}
+          >
             <ArrowDownUp aria-hidden className="size-4" />
             Curadoria da edição
             <ChevronDown aria-hidden className="size-4" />
           </Button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

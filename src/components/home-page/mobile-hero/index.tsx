@@ -1,10 +1,14 @@
 import { ChevronRight } from "lucide-react";
+import { motion } from "motion/react";
 
 import { featuredCountry, getFlagSource } from "@/data/countries";
+import { useRevealOnEnter } from "@/hooks/use-reveal-on-enter";
 
 export function MobileHero() {
+  const reveal = useRevealOnEnter();
+
   return (
-    <section className="flex flex-col gap-6 px-5 md:hidden">
+    <motion.section className="flex flex-col gap-6 px-5 md:hidden" {...reveal}>
       <div className="flex flex-col gap-3">
         <span className="type-label text-accent">Nº 01 · Novembro de 2026</span>
         <h1 className="type-headline text-ink">
@@ -26,6 +30,6 @@ export function MobileHero() {
         </div>
         <ChevronRight aria-hidden className="size-4 shrink-0 text-ink-3" />
       </div>
-    </section>
+    </motion.section>
   );
 }

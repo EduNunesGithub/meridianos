@@ -5,6 +5,7 @@
 ## Fontes
 
 - Estilos globais, tema e tipografia (UI-6): `src/styles/app.css`, carregado em `src/routes/__root.tsx`.
+- Tokens de movimento (UI-12): `src/lib/motion.ts`.
 
 ## Regras
 
@@ -61,7 +62,29 @@
 - Por quê: a interface fala o idioma de quem a usa.
 - Escopo: rótulos, mensagens (inclusive de validação e de erro), texto alternativo e atributos de acessibilidade como `alt` e `aria-label`, título e metadados da página.
 
+### UI-12: Animação feita com Motion usa as transições e as variantes de `src/lib/motion.ts`; duração, curva, mola ou deslocamento avulso no componente é proibido.
+
+- Por quê: o mesmo gesto tem o mesmo ritmo em todas as telas, e o ajuste da fluidez acontece num lugar só.
+- Como: necessidade que nenhum token cobre ganha um token novo no módulo, com nome pelo papel do movimento, não pelo valor.
+- Fonte: os tokens de movimento, em `Fontes`.
+
+### UI-13: Motion anima só `transform` e `opacity`, inclusive pela animação de `layout`; mudança de cor, borda ou sombra por estado usa transição CSS do Tailwind.
+
+- Por quê: `transform` e `opacity` rodam no compositor, sem recalcular layout nem repintar a cada quadro; e cada tipo de transição tem uma ferramenta só.
+
 ## Padrões
+
+### Blocos de movimento
+
+- Exemplar: `src/lib/motion.ts`, `src/hooks/use-motion-token/index.ts`, `src/hooks/use-reveal-on-enter/index.ts`, `src/components/presence-list/index.tsx`, `src/components/active-indicator-group/index.tsx` e `src/components/home-page/region-filter/index.tsx`
+- Como:
+  - Motion entra pelo pacote `motion`, importado de `motion/react`. O `RootDocument` envolve a aplicação em `MotionConfig` com `motionConfig`, que liga o movimento reduzido `"user"` e a transição padrão.
+  - Cada token de `src/lib/motion.ts` que desloca ou escala tem a forma `MotionToken` (`full` e `reduced`), e o componente o lê por `useMotionToken`. A forma `reduced` só anima opacidade, e o estado de repouso é o mesmo nas duas.
+  - Revelar uma seção ao entrar: troque a tag raiz por `motion.<tag>` e espalhe nela o retorno de `useRevealOnEnter()`.
+  - Lista cujos itens entram, saem ou mudam de lugar: `PresenceList` no lugar do `ul` e `PresenceListItem`, com `key` estável, no lugar do `li`.
+  - Opção ativa num grupo de opções: o grupo fica dentro de `ActiveIndicatorGroup`, e a opção ativa, com `relative isolate`, renderiza `ActiveIndicator`. O fundo ativo vem do indicador, não de `data-pressed:bg-*`; a cor do texto continua por `data-pressed:`.
+  - Feedback de toque em botão Base UI: `render={<motion.button {...useMotionToken(gestureFeedback.button)} />}`. Elevação de cartão em hover: `gestureFeedback.card` no elemento raiz do cartão.
+- Por quê: sem um conjunto fechado de blocos, cada tela montaria a sua combinação de variantes, SSR e movimento reduzido, e a fluidez divergiria entre telas.
 
 ### Tema diurno e noturno
 
@@ -86,3 +109,19 @@
 ### Duração padrão das transições do Tailwind
 
 - Atenção: as utilidades `transition`, `transition-colors`, `transition-shadow` e as demais usam `--default-transition-duration`, que é 150ms no Tailwind. Esse valor fere UI-5 e não aparece no código. Toda transição leva um `duration-*` com valor múltiplo de 250ms.
+
+### `initial` do Motion no HTML do servidor
+
+- Atenção: o estado `initial` de um componente `motion` sai no `style` do HTML renderizado no servidor, e conteúdo com `opacity: 0` fica invisível até a hidratação. Conteúdo da renderização do servidor anima com `initial={false}` até hidratar, como em `useRevealOnEnter`; por isso a revelação só acontece em montagens no cliente.
+
+### Movimento reduzido no Motion
+
+- Atenção: `reducedMotion: "user"` só desliga as animações de `transform` e de `layout`; a escala e o deslocamento dos estados ainda saltam de uma vez. O componente precisa da forma `reduced` do token (`useMotionToken`).
+
+### `whileTap` em elemento não focável
+
+- Atenção: o gesto de toque do Motion (`whileTap`) põe `tabindex="0"` em elemento que não é focável por natureza, como `article` ou `div`, e cria paradas de Tab sem ação. Use `whileTap` só em `button` ou `a`.
+
+### `layoutId` em componente montado duas vezes
+
+- Atenção: componentes como `RegionFilter` e `ThemeToggle` ficam montados ao mesmo tempo nas versões desktop e mobile, uma escondida por CSS. Sem um `LayoutGroup` com id próprio (`ActiveIndicatorGroup`), o `layoutId` salta entre as duas instâncias.

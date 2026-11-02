@@ -1,19 +1,24 @@
 import { ArrowUpRight } from "lucide-react";
+import { motion } from "motion/react";
 
 import type { Country } from "@/data/countries";
 
 import { RegionDot } from "@/components/region-dot";
 import { getFlagSource } from "@/data/countries";
 import { getRegionLabel } from "@/data/regions";
+import { useMotionToken } from "@/hooks/use-motion-token";
 import { formatPopulation } from "@/lib/format-population";
+import { gestureFeedback } from "@/lib/motion";
 
 type CountryCardProps = {
   country: Country;
 };
 
 export function CountryCard({ country }: CountryCardProps) {
+  const cardFeedback = useMotionToken(gestureFeedback.card);
+
   return (
-    <article className="group flex flex-col gap-4">
+    <motion.article className="group flex flex-col gap-4" {...cardFeedback}>
       <div className="flex h-49 flex-col justify-between bg-mat mat-glow px-4 py-3 text-ink-3 transition-colors duration-250 group-hover:bg-mat-hover group-hover:text-ink-2">
         <div className="flex items-center justify-between">
           <span className="type-label">{country.isoCode}</span>
@@ -63,6 +68,6 @@ export function CountryCard({ country }: CountryCardProps) {
           </div>
         </dl>
       </div>
-    </article>
+    </motion.article>
   );
 }
