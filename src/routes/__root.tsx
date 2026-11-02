@@ -1,12 +1,14 @@
 import { createRootRoute } from "@tanstack/react-router";
 
 import { RootDocument } from "@/components/root-document";
+import { getThemePreference } from "@/lib/theme";
 import appCss from "@/styles/app.css?url";
 
 const fontsHref =
   "https://fonts.googleapis.com/css2?family=DM+Mono&family=Instrument+Sans:wght@400..700&family=Instrument+Serif:ital@0;1&display=swap";
 
 export const Route = createRootRoute({
+  beforeLoad: () => ({ themePreference: getThemePreference() }),
   head: () => ({
     links: [
       { href: "https://fonts.googleapis.com", rel: "preconnect" },

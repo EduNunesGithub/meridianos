@@ -1,65 +1,61 @@
-export type Theme = "dark" | "light";
+import { createClientOnlyFn, createIsomorphicFn } from "@tanstack/react-start";
+import { getCookie } from "@tanstack/react-start/server";
 
-const darkClassName = "dark";
-const darkSchemeQuery = "(prefers-color-scheme: dark)";
-const themeStorageKey = "meridiano-theme";
+export type ThemePreference = (typeof themePreferences)[number];
 
-export const themeScript = `(() => {
-  const root = document.documentElement;
-  try {
-    const stored = localStorage.getItem("${themeStorageKey}");
-    const isDark = stored ? stored === "dark" : matchMedia("${darkSchemeQuery}").matches;
-    root.classList.toggle("${darkClassName}", isDark);
-  } catch {
-    root.classList.toggle("${darkClassName}", matchMedia("${darkSchemeQuery}").matches);
+type ResolvedTheme = "dark" | "light";
+
+export const darkClassName = "dark";
+
+export const darkSchemeQuery = "(prefers-color-scheme: dark)";
+
+export const getThemePreference = createIsomorphicFn()
+  .server(() => parseThemePreference(getCookie(themeCookieName)))
+  .client(() => parseThemePreference(readDocumentCookie(themeCookieName)));
+
+export const saveThemePreference = createClientOnlyFn(
+  (preference: ThemePreference) => {
+    document.cookie = `${themeCookieName}=${preference}; Max-Age=${themeCookieMaxAge}; Path=/; SameSite=Lax`;
+  },
+);
+
+export const systemThemeScript = `(${applySystemTheme.toString()})(${JSON.stringify(darkClassName)}, ${JSON.stringify(darkSchemeQuery)})`;
+
+const themeCookieMaxAge = 60 * 60 * 24 * 365;
+
+const themeCookieName = "meridiano-theme";
+
+const themePreferences = ["light", "dark", "system"] as const;
+
+export function resolveTheme(
+  preference: ThemePreference,
+  prefersDarkScheme: boolean,
+): ResolvedTheme {
+  if (preference !== "system") {
+    return preference;
   }
-})();`;
 
-export function getServerTheme(): Theme {
-  return "light";
+  return prefersDarkScheme ? "dark" : "light";
 }
 
-export function getTheme(): Theme {
-  return document.documentElement.classList.contains(darkClassName)
-    ? "dark"
-    : "light";
+function applySystemTheme(className: string, query: string) {
+  document.documentElement.classList.toggle(
+    className,
+    window.matchMedia(query).matches,
+  );
 }
 
-export function setTheme(theme: Theme) {
-  applyTheme(theme);
-  try {
-    localStorage.setItem(themeStorageKey, theme);
-  } catch {
-    return;
-  }
+function parseThemePreference(value: string | undefined): ThemePreference {
+  return (
+    themePreferences.find((preference) => preference === value) ?? "system"
+  );
 }
 
-export function subscribeToTheme(onChange: () => void) {
-  const observer = new MutationObserver(onChange);
-  observer.observe(document.documentElement, { attributeFilter: ["class"] });
+function readDocumentCookie(name: string) {
+  const prefix = `${name}=`;
 
-  const systemScheme = matchMedia(darkSchemeQuery);
-  const followSystem = () => {
-    if (!readStoredTheme()) {
-      applyTheme(systemScheme.matches ? "dark" : "light");
-    }
-  };
-  systemScheme.addEventListener("change", followSystem);
-
-  return () => {
-    observer.disconnect();
-    systemScheme.removeEventListener("change", followSystem);
-  };
-}
-
-function applyTheme(theme: Theme) {
-  document.documentElement.classList.toggle(darkClassName, theme === "dark");
-}
-
-function readStoredTheme() {
-  try {
-    return localStorage.getItem(themeStorageKey);
-  } catch {
-    return null;
-  }
+  return document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith(prefix))
+    ?.slice(prefix.length);
 }

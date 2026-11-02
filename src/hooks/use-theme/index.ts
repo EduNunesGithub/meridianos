@@ -1,18 +1,29 @@
-import { useSyncExternalStore } from "react";
-
 import {
-  getServerTheme,
-  getTheme,
-  setTheme,
-  subscribeToTheme,
-} from "@/lib/theme";
+  rootRouteId,
+  useRouteContext,
+  useRouter,
+} from "@tanstack/react-router";
+
+import type { ThemePreference } from "@/lib/theme";
+
+import { usePrefersDarkScheme } from "@/hooks/use-prefers-dark-scheme";
+import { resolveTheme, saveThemePreference } from "@/lib/theme";
 
 export function useTheme() {
-  const theme = useSyncExternalStore(
-    subscribeToTheme,
-    getTheme,
-    getServerTheme,
-  );
+  const router = useRouter();
+  const { themePreference } = useRouteContext({ from: rootRouteId });
+  const prefersDarkScheme = usePrefersDarkScheme();
 
-  return { setTheme, theme };
+  function setThemePreference(preference: ThemePreference) {
+    saveThemePreference(preference);
+    return router.invalidate({
+      filter: (match) => match.routeId === rootRouteId,
+    });
+  }
+
+  return {
+    resolvedTheme: resolveTheme(themePreference, prefersDarkScheme),
+    setThemePreference,
+    themePreference,
+  };
 }
