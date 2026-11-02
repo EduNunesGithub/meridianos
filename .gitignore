@@ -1,0 +1,7 @@
+.env
+.env.*
+.output/
+.tanstack/
+.vinxi/
+dist/
+node_modules/
