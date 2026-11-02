@@ -65,12 +65,15 @@
 
 ### Tema diurno e noturno
 
-- Exemplar: `src/styles/app.css`, `src/lib/theme.ts` e `src/hooks/use-theme/index.ts`
+- Exemplar: `src/lib/theme.ts`, `src/hooks/use-theme/index.ts`, `src/components/root-document/index.tsx` e `src/components/theme-toggle/index.tsx`
 - Como:
   - Os tokens de cor são variáveis CSS em `:root` (claro) e `.dark` (escuro) no `app.css`, expostas ao Tailwind por `@theme inline`. A variante escura é `@custom-variant dark` pela classe `dark` no `<html>`.
-  - Um script inline, em `ScriptOnce` no `<head>` do `RootDocument`, aplica a classe antes da pintura, a partir da escolha salva no `localStorage` ou de `prefers-color-scheme`.
-  - O React lê o tema pelo hook `useTheme`, cuja fonte de verdade é a classe no `<html>`. A aparência que depende do tema usa só `dark:`, nunca uma condição no render.
-- Por quê: sem a classe aplicada antes da pintura, o tema errado aparece por um instante; com uma condição no render, o HTML do servidor diverge do cliente na hidratação.
+  - A preferência (`light`, `dark` ou `system`) mora no cookie `meridiano-theme`. É lida por uma função de `createIsomorphicFn`, que usa `getCookie` no servidor e `document.cookie` no cliente, e gravada por uma `createClientOnlyFn`, sem server function.
+  - O `beforeLoad` da rota raiz põe `themePreference` no contexto. O hook `useTheme` lê esse contexto, deriva o tema resolvido com `prefers-color-scheme` e, ao trocar, grava o cookie e chama `router.invalidate` filtrado na raiz.
+  - O `RootDocument` controla a classe `dark` do `<html>`. Só com `system` ele emite um `ScriptOnce`, que resolve `prefers-color-scheme` antes da pintura.
+  - A aparência que depende do tema resolvido usa só `dark:`. O estado de um controle (como a opção ativa do seletor) usa o atributo de estado do Base UI, como `data-pressed:`, nunca `dark:`.
+- Por quê: com o cookie, o servidor já renderiza o tema certo, e o HTML não diverge do cliente na hidratação. Sem o script, `system` mostraria o tema errado por um instante.
+- Anterior: tema no `localStorage`, aplicado só por script inline, com a classe do `<html>` como fonte de verdade vigiada por `MutationObserver`.
 
 ### Estilos de texto por utilitário de contexto
 

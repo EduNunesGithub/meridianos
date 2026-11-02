@@ -100,3 +100,7 @@
 ### Árvore de rotas gerada
 
 - Atenção: `src/routeTree.gen.ts` é escrito pelo plugin do TanStack Start a cada `pnpm dev` ou `pnpm build`, a partir de `src/routes/`. Não o edite; ele fica fora do Prettier e do ESLint e é versionado, para que `pnpm typecheck` funcione num clone novo. Missão que cria, renomeia ou apaga rota tem esse arquivo nos artefatos.
+
+### `loader` junto de `head` numa rota
+
+- Atenção: numa rota com `head`, acrescentar `loader` faz `@tanstack/router/create-route-property-order` (que exige `loader` antes de `head`) e `perfectionist/sort-objects` (ordem alfabética) entrarem em ciclo, e o `eslint --fix` avisa "Circular fixes". Para dado que a rota inteira usa, prefira `beforeLoad`, que satisfaz as duas regras, como em `src/routes/__root.tsx`. Se a rota precisar mesmo de `loader`, a configuração do lint se corrige como mudança em arquivo protegido.
